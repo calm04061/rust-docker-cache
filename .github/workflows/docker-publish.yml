@@ -61,31 +61,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Rust Registry Build Cache for Docker
-        uses: actions/cache@v3
-        with:
-          path: rust-registry-build-cache
-          key: ${{ runner.os }}-rust-registry-build-cache-${{ hashFiles('**/Cargo.toml') }}
-      - name: Rust Target Build Cache for Docker
-        uses: actions/cache@v3
-        with:
-          path: rust-target-build-cache
-          key: ${{ runner.os }}-rust-registry-build-cache-${{ hashFiles('**/Cargo.toml') }}
 
-      - name: inject rust-build-registry-cache into docker
-        # v1 was composed of two actions: "inject" and "extract".
-        # v2 is unified to a single action.
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.2
-        with:
-          cache-source: rust-registry-build-cache
-          cache-target: /root/.cargo/registry
-      - name: inject rust-build-target-cache into docker
-        # v1 was composed of two actions: "inject" and "extract".
-        # v2 is unified to a single action.
-        uses: reproducible-containers/buildkit-cache-dance@v2.1.2
-        with:
-          cache-source: rust-target-build-cache
-          cache-target: /src/target
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
@@ -98,6 +74,6 @@ jobs:
           build-args: REPO=ghcr.io/calm04061
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=ghcr.io/calm04061/rust-docker-cache:buildcache
+          cache-to: type=registry,ref=ghcr.io/calm04061/rust-docker-cache:buildcache,mode=max
           provenance: false
