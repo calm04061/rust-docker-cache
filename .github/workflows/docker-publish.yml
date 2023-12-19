@@ -97,7 +97,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           build-args: REPO=ghcr.io/calm04061
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/arm64/v8,linux/amd64
+          platforms: linux/amd64
           cache-from: type=gha
           cache-to: type=gha,mode=max
           provenance: false
